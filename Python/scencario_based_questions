@@ -1,21 +1,55 @@
 ===================================================================================
+++++++++++++++++++=create ec2 instance on aws cloud+++++++++++++++++++++
 import boto3
 
-def create_ec2_instance():
-    ec2 = boto3.resource('ec2')  # Create an EC2 resource object
-    instance = ec2.create_instances(
-        ImageId='ami-0abcdef1234567890',  # Replace with your desired AMI ID
+def create_ec2_instance(region_name):
+    # Initialize a session using Amazon EC2 in a specific region
+    ec2 = boto3.resource('ec2', region_name=region_name)
+
+    # Create a new EC2 instance
+    instances = ec2.create_instances(
+        ImageId='ami-0abcdef1234567890',  # Replace with your AMI ID
         MinCount=1,
         MaxCount=1,
-        InstanceType='t2.micro',
-        KeyName='my-key-pair'  # Replace with your SSH key pair name
+        InstanceType='t2.micro',         # Replace with your instance type
+        KeyName='your-key-pair',          # Replace with your key pair name
+        SecurityGroupIds=['sg-0abcdef1234567890'],  # Replace with your security group ID
+        SubnetId='subnet-0abcdef1234567890'        # Replace with your subnet ID
     )
-    return instance[0].id
 
-instance_id = create_ec2_instance()
-print(f'Created instance with ID: {instance_id}')
+    print("Creating instance...")
+    for instance in instances:
+        print(f'Instance ID: {instance.id}')
+
+if __name__ == '__main__':
+    region = 'us-west-2'  # Replace with your desired AWS region
+    create_ec2_instance(region)
 ===================================================================================
 ===================================================================================
+
+++++++++++ terminate ec2 instance already created one++++++++++++++
+import boto3
+
+def terminate_ec2_instance(instance_id, region_name):
+    # Initialize a session using Amazon EC2 in a specific region
+    ec2_client = boto3.client('ec2', region_name=region_name)
+    
+    # Terminate the specified instance
+    response = ec2_client.terminate_instances(
+        InstanceIds=[instance_id]
+    )
+    
+    # Print response to confirm termination
+    print(f'Termination response: {response}')
+
+if __name__ == '__main__':
+    instance_id = 'i-0abcdef1234567890'  # Replace with your instance ID
+    region = 'us-west-2'  # Replace with your desired AWS region
+    
+    terminate_ec2_instance(instance_id, region)
+===========================================================================
+==========================================================================
+
 from kubernetes import client, config
 
 def get_pod_status(namespace, pod_name):
