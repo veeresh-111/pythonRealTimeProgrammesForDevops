@@ -356,4 +356,40 @@ def delete_logs(job_name):
 if __name__ == "__main__":
     job_name = 'Infra-Pipeline-Eks-Terraform-Based'  # Replace with your job name
     delete_logs(job_name)
+===================================================================================================================
+==================================================================================================================
+++++++++++++++++++++++++Python Script to Trigger a Jenkins Build++++++++++++++++++++
+import requests
+from requests.auth import HTTPBasicAuth
+
+# Configuration
+JENKINS_URL = 'http://52.44.57.170:8080/'  # Replace with your Jenkins URL
+JENKINS_USER = 'admin'           # Replace with your Jenkins username
+JENKINS_API_TOKEN = '11c81bb7222cb88196d9a8b076a7d7765f'     # Replace with your Jenkins API token
+JOB_NAME = 'amazon-clone-CI-Docker-based'               # Replace with your Jenkins job name
+
+def trigger_build(job_name):
+    try:
+        # Construct the URL for triggering the build
+        build_url = f'{JENKINS_URL}/job/{job_name}/build'
+
+        # Trigger the build
+        response = requests.post(
+            build_url,
+            auth=HTTPBasicAuth(JENKINS_USER, JENKINS_API_TOKEN)
+        )
+
+        # Check the response
+        if response.status_code == 201:
+            print(f"Build triggered successfully for job '{job_name}'.")
+        else:
+            print(f"Failed to trigger build. Status code: {response.status_code}")
+            print(f"Response: {response.text}")
+
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    trigger_build(JOB_NAME)
+
 
