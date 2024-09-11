@@ -319,3 +319,41 @@ yaml_file = 'deployment.yaml'
 deploy_kubernetes_app(yaml_file)
 ===================================================================================
 ===================================================================================
+
++++++++++++++++++===Delete the Jenkins Jobs logs++++++++++++++++++++++++++++
+import requests
+from requests.auth import HTTPBasicAuth
+
+# Configuration
+JENKINS_URL = 'http://52.44.57.170:8080/'  # Replace with your Jenkins URL
+JENKINS_USER = 'admin'           # Replace with your Jenkins username
+JENKINS_API_TOKEN = '11c81bb7222cb88196d9a8b076a7d7765f'     # Replace with your Jenkins API token
+
+def delete_logs(job_name):
+    try:
+        # Get all builds for the specified job
+        builds_url = f'{JENKINS_URL}/job/{job_name}/api/json'
+        response = requests.get(builds_url, auth=HTTPBasicAuth(JENKINS_USER, JENKINS_API_TOKEN))
+        response.raise_for_status()
+        builds = response.json().get('builds', [])
+
+        for build in builds:
+            build_number = build['number']
+            print(f"Processing build {build_number}...")
+
+            # Delete build logs
+            if build_number == 1:
+                build_url = f'{JENKINS_URL}/job/{job_name}/{build_number}/consoleText'
+                response = requests.delete(build_url, auth=HTTPBasicAuth(JENKINS_USER, JENKINS_API_TOKEN))
+                if response.status_code == 200:
+                    print(f"Successfully deleted logs for build {build_number}.")
+                else:
+                    print(f"Failed to delete logs for build {build_number}. Status code: {response.status_code}")
+
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    job_name = 'Infra-Pipeline-Eks-Terraform-Based'  # Replace with your job name
+    delete_logs(job_name)
+
