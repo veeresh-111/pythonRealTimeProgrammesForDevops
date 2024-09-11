@@ -391,5 +391,50 @@ def trigger_build(job_name):
 
 if __name__ == "__main__":
     trigger_build(JOB_NAME)
+=================================================================================================================
+=================================================================================================================
+++++++++++++++++++++++++Python Script to DELETE a Failed Jenkins Build++++++++++++++++++++++++++++
+import requests
+from requests.auth import HTTPBasicAuth
+
+# Configuration
+JENKINS_URL = 'http://52.44.57.170:8080/'  # Replace with your Jenkins URL
+JENKINS_USER = 'admin'           # Replace with your Jenkins username
+JENKINS_API_TOKEN = '11c81bb7222cb88196d9a8b076a7d7765f'     # Replace with your Jenkins API token
+JOB_NAME = 'amazon-clone-CI-Docker-based'               # Replace with your Jenkins job name
+
+def delete_failed_builds(job_name):
+    try:
+        # Get the list of builds
+        builds_url = f'{JENKINS_URL}/job/{job_name}/api/json?tree=builds[number,status]'
+        response = requests.get(builds_url, auth=HTTPBasicAuth(JENKINS_USER, JENKINS_API_TOKEN))
+        response.raise_for_status()
+        builds = response.json().get('builds', [])
+
+        for build in builds:
+            build_number = build['number']
+            build_status = build['status']
+            
+            # Check if the build status is 'FAILURE'
+            if build_status == 'FAILURE':
+                print(f"Deleting failed build {build_number}...")
+                
+                # Delete the failed build
+                delete_url = f'{JENKINS_URL}/job/{job_name}/{build_number}/doDelete'
+                delete_response = requests.post(delete_url, auth=HTTPBasicAuth(JENKINS_USER, JENKINS_API_TOKEN))
+                
+                if delete_response.status_code == 200:
+                    print(f"Successfully deleted build {build_number}.")
+                else:
+                    print(f"Failed to delete build {build_number}. Status code: {delete_response.status_code}")
+                    print(f"Response: {delete_response.text}")
+            else:
+                print(f"Build {build_number} did not fail; status: {build_status}")
+
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    delete_failed_builds(JOB_NAME)
 
 
