@@ -1,5 +1,6 @@
 ===================================================================================
-++++++++++++++++++=create ec2 instance on aws cloud+++++++++++++++++++++
+Q1) CREATING EC2 INSTANCE USING PYHTON PACKAGE BOTO3 ON ANY CLOUD PROVIDER?
+ANS:
 import boto3
 
 def create_ec2_instance(region_name):
@@ -25,9 +26,8 @@ if __name__ == '__main__':
     region = 'us-west-2'  # Replace with your desired AWS region
     create_ec2_instance(region)
 ===================================================================================
-===================================================================================
-
-++++++++++ terminate ec2 instance already created one++++++++++++++
+Q2) START STOP TERMINATE THE ALREADY EXISTED EC2 INSTANCE ON ANY CLOUD PROVIDER?
+ANS:
 import boto3
 
 def terminate_ec2_instance(instance_id, region_name):
